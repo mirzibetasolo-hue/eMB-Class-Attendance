@@ -21,6 +21,17 @@ The previous Cloudflare-hosted app has a separate SQLite/D1 database. This Netli
 - `netlify.toml`: empty build command, static publish directory, and `/api/*` routing.
 - `SPEC.md`: detailed behavior and data specification.
 
+## Run locally
+
+1. Install Node.js 22.13 or later and Netlify CLI 26 or later (`npm install -g netlify-cli`). A network connection is needed to install dependencies; the app itself is online-only.
+2. Download and extract the project ZIP, then open a terminal in the extracted `eMB-Class-Attendance` directory.
+3. Run `npm ci` to install the project dependencies.
+4. Run `netlify dev` and open the local URL it prints (normally `http://localhost:8888`). Netlify Dev starts a local Postgres-compatible database and serves the frontend and API together. Follow any CLI setup or sign-in prompts.
+5. If the app reports missing database tables, run `netlify database migrations apply` in another terminal in the same project directory, then refresh. Run `netlify database status` to inspect migration status.
+6. On the first visit, create an administrator account. This local account and attendance data are separate from any deployed site.
+
+Keep `netlify dev` running while using the app. Do not open `out/index.html` directly: browser file URLs cannot run the API or database. Running the app on a phone requires exposing the local server securely on your network; the default local URL is intended for your computer.
+
 ## Local maintenance
 
-Run `npm install`, `npm run typecheck`, `npm run build:frontend`, and `npm run check:function`. Use `netlify dev` with a local Netlify Database for end-to-end API testing. Do not commit credentials, local database files, or `.env` files.
+Run `npm run typecheck`, `npm run build:frontend`, and `npm run check:function` after changing source. Commit updated `out/` when rebuilding the frontend. Do not commit credentials, local database files, or `.env` files.
