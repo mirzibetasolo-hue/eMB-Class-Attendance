@@ -1,0 +1,11 @@
+CREATE TABLE users (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, name TEXT NOT NULL, role TEXT NOT NULL CHECK (role IN ('admin','teacher','student')), password_hash TEXT NOT NULL, created_at BIGINT NOT NULL);
+CREATE TABLE auth_sessions (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), token_hash TEXT NOT NULL UNIQUE, expires_at BIGINT NOT NULL);
+CREATE TABLE subjects (id TEXT PRIMARY KEY, code TEXT NOT NULL, description TEXT NOT NULL, semester TEXT NOT NULL, teacher_id TEXT NOT NULL REFERENCES users(id), created_at BIGINT NOT NULL);
+CREATE TABLE enrollments (id TEXT PRIMARY KEY, subject_id TEXT NOT NULL REFERENCES subjects(id), student_id TEXT NOT NULL REFERENCES users(id), position INTEGER NOT NULL, UNIQUE(subject_id,student_id));
+CREATE TABLE class_sessions (id TEXT PRIMARY KEY, subject_id TEXT NOT NULL REFERENCES subjects(id), starts_at BIGINT NOT NULL, ends_at BIGINT NOT NULL, code_hash TEXT NOT NULL, created_at BIGINT NOT NULL);
+CREATE TABLE attendance (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES class_sessions(id), student_id TEXT NOT NULL REFERENCES users(id), status TEXT NOT NULL CHECK (status IN ('present','late','escape','absent')), score INTEGER NOT NULL, checked_at BIGINT, recorded_at BIGINT NOT NULL, source TEXT NOT NULL, UNIQUE(session_id,student_id));
+CREATE TABLE audit (id TEXT PRIMARY KEY, attendance_id TEXT NOT NULL REFERENCES attendance(id), actor_id TEXT NOT NULL REFERENCES users(id), previous TEXT, next TEXT NOT NULL, reason TEXT NOT NULL, at BIGINT NOT NULL);
+CREATE INDEX idx_subjects_teacher ON subjects(teacher_id);
+CREATE INDEX idx_enrollments_student ON enrollments(student_id);
+CREATE INDEX idx_sessions_subject ON class_sessions(subject_id);
+CREATE INDEX idx_attendance_session ON attendance(session_id);
